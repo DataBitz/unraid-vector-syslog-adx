@@ -1,0 +1,53 @@
+{
+  "sources": {
+    "syslog_udp": {
+      "type": "syslog",
+      "mode": "udp",
+      "address": "0.0.0.0:${SYSLOG_UDP_PORT}"
+    },
+    "syslog_tcp": {
+      "type": "syslog",
+      "mode": "tcp",
+      "address": "0.0.0.0:${SYSLOG_TCP_PORT}"
+    }
+  },
+  "transforms": {
+    "format_kusto": {
+      "type": "remap",
+      "inputs": [
+        "syslog_udp",
+        "syslog_tcp"
+      ],
+      "source": ".Timestamp = .timestamp\n.Source = .host\n.Facility = .facility\n.Severity = .severity\n.Message = .message\n.Environment = \"${ENVIRONMENT}\"\n.RawData = .\n"
+    }
+  },
+  "sinks": {
+    "azure_adx": {
+      "type": "http",
+      "inputs": [
+        "format_kusto"
+      ],
+      "uri": "https://ingest-${ADX_CLUSTER_NAME}.${ADX_REGION}.kusto.windows.net/v1/rest/ingest/v2/ingestFromStream?db=${ADX_DATABASE}&table=${ADX_TABLE}&format=multijson",
+      "method": "post",
+      "encoding": {
+        "codec": "json"
+      },
+      "batch": {
+        "max_bytes": ${BATCH_MAX_BYTES},
+        "timeout_secs": ${BATCH_TIMEOUT_SECS}
+      },
+      "buffer": {
+        "type": "disk",
+        "max_bytes": ${BUFFER_MAX_BYTES}
+      },
+      "auth": {
+        "strategy": "oauth",
+        "grant_type": "client_credentials",
+        "client_id": "${AZURE_CLIENT_ID}",
+        "client_secret": "${AZURE_CLIENT_SECRET}",
+        "token_url": "https://login.microsoftonline.com/${AZURE_TENANT_ID}/oauth2/v2.0/token",
+        "scope": "https://kusto.kusto.windows.net/.default"
+      }
+    }
+  }
+}
