@@ -9,12 +9,15 @@
   <Privileged>false</Privileged>
   <Support>https://github.com/DataBitz/unraid-vector-syslog-adx/issues</Support>
   <Project>https://vector.dev/</Project>
-  <TemplateURL>https://raw.githubusercontent.com/DataBitz/unraid-vector-syslog-adx/main/vector-syslog.xml</TemplateURL>
-  <Overview>Vector is a high-performance, ultra-lightweight log collector and forwarder. This template configures Vector to listen for UDP and TCP Syslog traffic on port 514 and stream structured JSON events to a free Azure Data Explorer (ADX) cluster using Microsoft Entra ID (Service Principal) authentication.&#xD;&#xD;PREREQUISITE: Run this 1-line command in the Unraid Terminal to download the default vector.json configuration file before starting the container:&#xD;&#xD;mkdir -p /mnt/user/appdata/vector &amp;&amp; curl -sSL https://raw.githubusercontent.com/DataBitz/unraid-vector-syslog-adx/main/vector.json -o /mnt/user/appdata/vector/vector.json</Overview>
+  <TemplateURL>https://raw.githubusercontent.com/DataBitz/unraid-vector-syslog-adx/main/unraid-vector-syslog-adx.xml</TemplateURL>
+  <Overview>Vector is a high-performance, ultra-lightweight log collector and forwarder. This template configures Vector to listen for UDP and TCP Syslog traffic on port 514 and stream structured JSON events to a free Azure Data Explorer (ADX) cluster using Microsoft Entra ID (Service Principal) authentication.&#xD;&#xD;The default vector.json configuration file is automatically downloaded from GitHub to your appdata folder on first container launch if missing.</Overview>
   <Category>Tools:Utilities Network:Management</Category>
   <Icon>https://raw.githubusercontent.com/vectordotdev/vector/master/website/static/img/vector-logo.png</Icon>
   <Maintainer>DataBitz</Maintainer>
-  <Changes>Initial release of Vector Syslog to Azure Data Explorer (ADX) container template with JSON config support, TCP/UDP ingestion, and Azure Entra ID environment variables.</Changes>
+  <Changes>Updated template filename reference to unraid-vector-syslog-adx.xml.</Changes>
+
+  <!-- Auto-creates vector.json from GitHub if missing on container boot -->
+  <PostArgs>sh -c 'mkdir -p /etc/vector &amp;&amp; if [ ! -f /etc/vector/vector.json ]; then echo "Creating default vector.json..."; curl -sSL https://raw.githubusercontent.com/DataBitz/unraid-vector-syslog-adx/main/vector.json -o /etc/vector/vector.json; fi &amp;&amp; exec vector --config /etc/vector/vector.json'</PostArgs>
 
   <!-- Local AppData Configuration Volume -->
   <Data>
