@@ -7,14 +7,14 @@
   <MyIP/>
   <Shell>bash</Shell>
   <Privileged>false</Privileged>
-  <Support>https://github.com/vectordotdev/vector/issues</Support>
+  <Support>https://github.com/DataBitz/unraid-vector-syslog-adx/issues</Support>
   <Project>https://vector.dev/</Project>
-  <Overview>Vector is a high-performance, lightweight log collector and forwarder. This template sets up Vector to listen for UDP and TCP Syslog traffic on port 514 and automatically stream structured JSON logs to a free Azure Data Explorer (ADX) / Kusto cluster using Microsoft Entra ID (Service Principal) authentication. All ADX endpoints, database names, table schemas, and batch settings are fully customizable via container variables.</Overview>
+  <TemplateURL>https://raw.githubusercontent.com/DataBitz/unraid-vector-syslog-adx/main/vector-syslog.xml</TemplateURL>
+  <Overview>Vector is a high-performance, ultra-lightweight log collector and forwarder. This template configures Vector to listen for UDP and TCP Syslog traffic on port 514 and stream structured JSON events to a free Azure Data Explorer (ADX) cluster using Microsoft Entra ID (Service Principal) authentication.&#xD;&#xD;PREREQUISITE: Run this 1-line command in the Unraid Terminal to download the default vector.json configuration file before starting the container:&#xD;&#xD;mkdir -p /mnt/user/appdata/vector &amp;&amp; curl -sSL https://raw.githubusercontent.com/DataBitz/unraid-vector-syslog-adx/main/vector.json -o /mnt/user/appdata/vector/vector.json</Overview>
   <Category>Tools:Utilities Network:Management</Category>
   <Icon>https://raw.githubusercontent.com/vectordotdev/vector/master/website/static/img/vector-logo.png</Icon>
-  <TemplateURL/>
-  <Maintainer>Peter Cronwright</Maintainer>
-  <Changes>Updated template with JSON config support, ADX environment variable injection, TCP/UDP port exposure, and advanced batching/buffering parameters.</Changes>
+  <Maintainer>DataBitz</Maintainer>
+  <Changes>Initial release of Vector Syslog to Azure Data Explorer (ADX) container template with JSON config support, TCP/UDP ingestion, and Azure Entra ID environment variables.</Changes>
 
   <!-- Local AppData Configuration Volume -->
   <Data>
@@ -25,12 +25,12 @@
     </Volume>
   </Data>
 
-  <!-- Main Config File Mapping -->
+  <!-- Configuration File Path Mapping -->
   <Config Name="Vector Configuration File" Target="/etc/vector/vector.json" Default="/mnt/user/appdata/vector/vector.json" Mode="ro" Description="Path to your local vector.json file on Unraid. Vector reads this file on startup to build the syslog ingestion pipeline." Type="Path" Display="always" Required="true" Mask="false"/>
 
   <!-- ADX / Kusto Cluster Connection Variables -->
-  <Config Name="ADX Cluster Name" Target="ADX_CLUSTER_NAME" Default="smarthomelogs" Description="The name of your free ADX cluster (e.g., 'smarthomelogs' from ingest-smarthomelogs.region.kusto.windows.net)." Type="Variable" Display="always" Required="true" Mask="false"/>
-  <Config Name="ADX Region" Target="ADX_REGION" Default="eastus" Description="The Azure region where your ADX cluster is provisioned (e.g., 'eastus', 'westeurope', 'australiaeast')." Type="Variable" Display="always" Required="true" Mask="false"/>
+  <Config Name="ADX Cluster Name" Target="ADX_CLUSTER_NAME" Default="smarthomelogs" Description="The name of your free ADX cluster (e.g. 'smarthomelogs' from ingest-smarthomelogs.region.kusto.windows.net)." Type="Variable" Display="always" Required="true" Mask="false"/>
+  <Config Name="ADX Region" Target="ADX_REGION" Default="eastus" Description="The Azure region where your ADX cluster is provisioned (e.g. 'eastus', 'westeurope', 'australiaeast')." Type="Variable" Display="always" Required="true" Mask="false"/>
   <Config Name="ADX Database Name" Target="ADX_DATABASE" Default="HomeTelemetry" Description="The target Kusto database name created inside your ADX cluster." Type="Variable" Display="always" Required="true" Mask="false"/>
   <Config Name="ADX Table Name" Target="ADX_TABLE" Default="Syslogs" Description="The target table inside your Kusto database receiving structured logs." Type="Variable" Display="always" Required="true" Mask="false"/>
 
@@ -44,9 +44,9 @@
   <Config Name="Syslog TCP Port" Target="SYSLOG_TCP_PORT" Default="514" Description="TCP Port for receiving incoming Syslog streams from local network devices." Type="Variable" Display="always" Required="true" Mask="false"/>
   <Config Name="Environment Tag" Target="ENVIRONMENT" Default="home" Description="Custom metadata tag added to all outgoing logs to identify the origin network or host." Type="Variable" Display="always" Required="false" Mask="false"/>
 
-  <!-- Network Ports for Unraid Template Documentation -->
-  <Config Name="Syslog UDP Listener" Target="514" Default="514" Mode="udp" Description="Exposes UDP 514 on the Unraid host interface for router/switch syslog traffic." Type="Port" Display="always" Required="false" Mask="false"/>
-  <Config Name="Syslog TCP Listener" Target="514" Default="514" Mode="tcp" Description="Exposes TCP 514 on the Unraid host interface for reliable syslog streaming." Type="Port" Display="always" Required="false" Mask="false"/>
+  <!-- Network Ports for Unraid Template UI Documentation -->
+  <Config Name="Syslog UDP Listener" Target="514" Default="514" Mode="udp" Description="Exposes UDP port 514 on the Unraid host interface for router/switch syslog traffic." Type="Port" Display="always" Required="false" Mask="false"/>
+  <Config Name="Syslog TCP Listener" Target="514" Default="514" Mode="tcp" Description="Exposes TCP port 514 on the Unraid host interface for reliable syslog streaming." Type="Port" Display="always" Required="false" Mask="false"/>
 
   <!-- Advanced Pipeline Tuning -->
   <Config Name="Batch Max Bytes" Target="BATCH_MAX_BYTES" Default="1048576" Description="Maximum payload size in bytes (default 1 MB = 1048576) accumulated before flushing to ADX." Type="Variable" Display="advanced" Required="false" Mask="false"/>
