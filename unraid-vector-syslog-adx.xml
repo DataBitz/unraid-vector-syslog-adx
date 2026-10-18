@@ -15,10 +15,7 @@
   <Category>Tools:Utilities Network:Management</Category>
   <Icon>https://avatars.githubusercontent.com/u/16866914?v=4</Icon>
   <Maintainer>DataBitz</Maintainer>
-  <Changes>Updated port variable and listener descriptions to clarify usage in Host vs Bridge/Custom network modes.</Changes>
-
-  <!-- Overrides default ENTRYPOINT so sh -c executes properly -->
-  <Entrypoint>sh</Entrypoint>
+  <Changes>Fixed PostArgs execution by removing Entrypoint tag and relying on standard shell execution.</Changes>
 
   <!-- Auto-creates vector.json from GitHub if missing on container boot -->
   <PostArgs>-c 'mkdir -p /etc/vector &amp;&amp; if [ ! -f /etc/vector/vector.json ]; then echo "Creating default vector.json..."; curl -sSL https://raw.githubusercontent.com/DataBitz/unraid-vector-syslog-adx/main/vector.json -o /etc/vector/vector.json; fi &amp;&amp; exec vector --config /etc/vector/vector.json'</PostArgs>
@@ -53,7 +50,7 @@
 
   <!-- Network Ports for Unraid Template UI & Port Forwarding -->
   <Config Name="Syslog UDP Listener" Target="514" Default="514" Mode="udp" Description="Used in Bridge/Custom modes for Docker NAT port forwarding (-p 514:514/udp). In Host mode, Docker ignores the NAT mapping, but Unraid uses this entry to display port 514 on the Docker dashboard." Type="Port" Display="always" Required="false" Mask="false"/>
-  <Config Name="Syslog TCP Listener" Target="514" Default="514" Mode="tcp" Description="Used in Bridge/Custom modes for Docker NAT port forwarding (-p 514:514/tcp). In Host mode, Docker ignores the NAT mapping, but Unraid uses this entry to display port 514 on the Docker dashboard." Type="Port" Display="always" Required="false" Mask="false"/>
+  <Config Name="Syslog TCP Listener" Target="514" Default="514" Mode="tcp" Description="Exposes TCP port 514 on the Unraid host interface for reliable syslog streaming." Type="Port" Display="always" Required="false" Mask="false"/>
 
   <!-- Advanced Pipeline Tuning -->
   <Config Name="Batch Max Bytes" Target="BATCH_MAX_BYTES" Default="1048576" Description="Maximum payload size in bytes (default 1 MB = 1048576) accumulated before flushing to ADX." Type="Variable" Display="advanced" Required="false" Mask="false"/>
