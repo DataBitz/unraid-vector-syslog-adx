@@ -38,7 +38,8 @@
       },
       "buffer": {
         "type": "disk",
-        "max_bytes": 5368709120
+        "max_bytes": 5368709120,
+        "when_full": "block"
       },
       "auth": {
         "strategy": "oauth",
