@@ -9,17 +9,17 @@ data_dir: "/var/lib/vector"
 # SOURCES: Define incoming network telemetry inputs
 # ------------------------------------------------------------------------------
 sources:
-  # Listens for UDP Syslog traffic from network devices (routers, switches, firewalls)
+  # Listens for UDP Syslog traffic on port 514
   syslog_udp:
     type: "syslog"
     mode: "udp"
-    address: "0.0.0.0:${SYSLOG_UDP_PORT}"
+    address: "0.0.0.0:514"
 
-  # Listens for TCP Syslog streams (reliable connection-oriented logging)
+  # Listens for TCP Syslog streams on port 514
   syslog_tcp:
     type: "syslog"
     mode: "tcp"
-    address: "0.0.0.0:${SYSLOG_TCP_PORT}"
+    address: "0.0.0.0:514"
 
 # ------------------------------------------------------------------------------
 # TRANSFORMS: Restructure and enrich Syslog fields to match ADX Kusto schema
