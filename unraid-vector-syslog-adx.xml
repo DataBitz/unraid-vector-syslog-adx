@@ -11,11 +11,11 @@
   <Project>https://vector.dev/</Project>
   <TemplateURL>https://raw.githubusercontent.com/DataBitz/unraid-vector-syslog-adx/main/unraid-vector-syslog-adx.xml</TemplateURL>
   <Overview>Vector is a high-performance, ultra-lightweight log collector and forwarder. This template configures Vector to listen for UDP and TCP Syslog traffic on port 514 and stream structured JSON events to a free Azure Data Explorer (ADX) cluster using Microsoft Entra ID (Service Principal) authentication.&#xD;&#xD;The default vector.json configuration file is automatically downloaded from GitHub to your appdata folder on first container launch if missing.</Overview>
-  <Requirements>REQUIRES PRE-CREATED AZURE RESOURCES:&#xD;1. An active Azure Data Explorer (ADX) cluster (or ADX Free cluster at aka.ms/kustofree) with a target database (e.g., HomeTelemetry) and table (e.g., Syslogs).&#xD;2. An Azure Entra ID App Registration (Service Principal) with a Client Secret.&#xD;3. Database Ingestor permissions granted to the App Registration in Kusto (.add database DatabaseName ingestors ('aadapp=CLIENT_ID;TENANT_ID')).</Requirements>
+  <Requires>REQUIRES PRE-CREATED AZURE RESOURCES:&#xD;1. An active Azure Data Explorer (ADX) cluster (or ADX Free cluster at aka.ms/kustofree) with a target database (e.g., HomeTelemetry) and table (e.g., Syslogs).&#xD;2. An Azure Entra ID App Registration (Service Principal) with a Client Secret.&#xD;3. Database Ingestor permissions granted to the App Registration in Kusto (.add database DatabaseName ingestors ('aadapp=CLIENT_ID;TENANT_ID')).</Requires>
   <Category>Tools:Utilities Network:Management</Category>
   <Icon>https://raw.githubusercontent.com/vectordotdev/vector/master/website/static/img/vector-logo.png</Icon>
   <Maintainer>DataBitz</Maintainer>
-  <Changes>Added requirements field detailing pre-created ADX cluster and Entra ID authentication prerequisites.</Changes>
+  <Changes>Updated Requires tag so Additional Requirements renders properly in Unraid UI.</Changes>
 
   <!-- Auto-creates vector.json from GitHub if missing on container boot -->
   <PostArgs>sh -c 'mkdir -p /etc/vector &amp;&amp; if [ ! -f /etc/vector/vector.json ]; then echo "Creating default vector.json..."; curl -sSL https://raw.githubusercontent.com/DataBitz/unraid-vector-syslog-adx/main/vector.json -o /etc/vector/vector.json; fi &amp;&amp; exec vector --config /etc/vector/vector.json'</PostArgs>
