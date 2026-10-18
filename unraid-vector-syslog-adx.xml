@@ -11,11 +11,11 @@
   <Project>https://vector.dev/</Project>
   <TemplateURL>https://raw.githubusercontent.com/DataBitz/unraid-vector-syslog-adx/main/unraid-vector-syslog-adx.xml</TemplateURL>
   <Overview>Vector is a high-performance, ultra-lightweight log collector and forwarder. This template configures Vector to listen for UDP and TCP Syslog traffic on port 514 and stream structured JSON events to a free Azure Data Explorer (ADX) cluster using Microsoft Entra ID (Service Principal) authentication.</Overview>
-  <Requires>REQUIRES PRE-CREATED AZURE RESOURCES:&#xD;1. An active Azure Data Explorer (ADX) cluster (or ADX Free cluster at aka.ms/kustofree) with a target database (e.g., MyADXDatabaseName) and table (e.g., Syslogs).&#xD;2. An Azure Entra ID App Registration (Service Principal) with a Client Secret.&#xD;3. Database Ingestor permissions granted to the App Registration in Kusto (.add database DatabaseName ingestors ('aadapp=CLIENT_ID;TENANT_ID')).&#xD;&#xD;NOTE: The default vector.json configuration file is automatically downloaded from GitHub to your appdata folder on first container launch if missing.</Requires>
+  <Requires>REQUIRES PRE-CREATED AZURE RESOURCES:&#xD;1. An active Azure Data Explorer (ADX) cluster (or ADX Free cluster at aka.ms/kustofree) with a target database (e.g., MyADXDatabaseName) and table (e.g., Syslog).&#xD;2. An Azure Entra ID App Registration (Service Principal) with a Client Secret.&#xD;3. Database Ingestor permissions granted to the App Registration in Kusto (.add database DatabaseName ingestors ('aadapp=CLIENT_ID;TENANT_ID')).&#xD;&#xD;NOTE: The default vector.json configuration file is automatically downloaded from GitHub to your appdata folder on first container launch if missing.</Requires>
   <Category>Tools:Utilities Network:Management</Category>
   <Icon>https://avatars.githubusercontent.com/u/16866914?v=4</Icon>
   <Maintainer>DataBitz</Maintainer>
-  <Changes>Updated Icon URL to stable GitHub Avatar CDN link.</Changes>
+  <Changes>Updated default ADX Table Name to Syslog.</Changes>
 
   <!-- Overrides default ENTRYPOINT so sh -c executes properly -->
   <Entrypoint>sh</Entrypoint>
@@ -39,7 +39,7 @@
   <Config Name="ADX Cluster Name" Target="ADX_CLUSTER_NAME" Default="MyADXClusterName" Description="The name of your free ADX cluster (e.g. 'MyADXClusterName' from ingest-MyADXClusterName.region.kusto.windows.net)." Type="Variable" Display="always" Required="true" Mask="false"/>
   <Config Name="ADX Region" Target="ADX_REGION" Default="eastus" Description="The Azure region where your ADX cluster is provisioned (e.g. 'eastus', 'westeurope', 'australiaeast')." Type="Variable" Display="always" Required="true" Mask="false"/>
   <Config Name="ADX Database Name" Target="ADX_DATABASE" Default="MyADXDatabaseName" Description="The target Kusto database name created inside your ADX cluster." Type="Variable" Display="always" Required="true" Mask="false"/>
-  <Config Name="ADX Table Name" Target="ADX_TABLE" Default="Syslogs" Description="The target table inside your Kusto database receiving structured logs." Type="Variable" Display="always" Required="true" Mask="false"/>
+  <Config Name="ADX Table Name" Target="ADX_TABLE" Default="Syslog" Description="The target table inside your Kusto database receiving structured logs." Type="Variable" Display="always" Required="true" Mask="false"/>
 
   <!-- Azure App Registration / Service Principal Auth -->
   <Config Name="Azure Tenant ID" Target="AZURE_TENANT_ID" Default="" Description="Directory (tenant) ID from your Azure Entra ID App Registration." Type="Variable" Display="always" Required="true" Mask="false"/>
