@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <Container version="2">
-  <Name>vector-syslog</Name>
+  <Name>vector-syslog-adx</Name>
   <Repository>timberio/vector:latest-alpine</Repository>
   <Registry>https://hub.docker.com/r/timberio/vector</Registry>
   <Network>host</Network>
@@ -14,7 +14,7 @@
   <Category>Tools:Utilities Network:Management</Category>
   <Icon>https://raw.githubusercontent.com/vectordotdev/vector/master/website/static/img/vector-logo.png</Icon>
   <Maintainer>DataBitz</Maintainer>
-  <Changes>Updated template filename reference to unraid-vector-syslog-adx.xml.</Changes>
+  <Changes>Updated container display name to vector-syslog-adx.</Changes>
 
   <!-- Auto-creates vector.json from GitHub if missing on container boot -->
   <PostArgs>sh -c 'mkdir -p /etc/vector &amp;&amp; if [ ! -f /etc/vector/vector.json ]; then echo "Creating default vector.json..."; curl -sSL https://raw.githubusercontent.com/DataBitz/unraid-vector-syslog-adx/main/vector.json -o /etc/vector/vector.json; fi &amp;&amp; exec vector --config /etc/vector/vector.json'</PostArgs>
