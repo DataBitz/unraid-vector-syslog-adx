@@ -3,12 +3,12 @@
     "syslog_udp": {
       "type": "syslog",
       "mode": "udp",
-      "address": "0.0.0.0:${SYSLOG_UDP_PORT:-514}"
+      "address": "0.0.0.0:514"
     },
     "syslog_tcp": {
       "type": "syslog",
       "mode": "tcp",
-      "address": "0.0.0.0:${SYSLOG_TCP_PORT:-514}"
+      "address": "0.0.0.0:514"
     }
   },
   "transforms": {
@@ -18,7 +18,7 @@
         "syslog_udp",
         "syslog_tcp"
       ],
-      "source": ".Timestamp = .timestamp\n.Source = .host\n.Facility = .facility\n.Severity = .severity\n.Message = .message\n.Environment = \"${ENVIRONMENT:-unraid}\"\n.RawData = .\n"
+      "source": ".Timestamp = .timestamp\n.Source = .host\n.Facility = .facility\n.Severity = .severity\n.Message = .message\n.Environment = \"${ENVIRONMENT}\"\n.RawData = .\n"
     }
   },
   "sinks": {
@@ -27,7 +27,7 @@
       "inputs": [
         "format_kusto"
       ],
-      "uri": "https://ingest-${ADX_CLUSTER_NAME:-MyADXClusterName}.${ADX_REGION:-eastus}.kusto.windows.net/v1/rest/ingest/v2/ingestFromStream?db=${ADX_DATABASE:-MyADXDatabaseName}&table=${ADX_TABLE:-Syslog}&format=multijson",
+      "uri": "https://ingest-${ADX_CLUSTER_NAME}.${ADX_REGION}.kusto.windows.net/v1/rest/ingest/v2/ingestFromStream?db=${ADX_DATABASE}&table=${ADX_TABLE}&format=multijson",
       "method": "post",
       "encoding": {
         "codec": "json"
