@@ -11,26 +11,27 @@
   <Project>https://vector.dev/</Project>
   <TemplateURL>https://raw.githubusercontent.com/DataBitz/unraid-vector-syslog-adx/main/unraid-vector-syslog-adx.xml</TemplateURL>
   <Overview>Vector is a high-performance, ultra-lightweight log collector and forwarder. This template configures Vector to listen for UDP and TCP Syslog traffic on port 514 and stream structured JSON events to a free Azure Data Explorer (ADX) cluster using Microsoft Entra ID (Service Principal) authentication.</Overview>
-  <Requires>REQUIRES PRE-CREATED AZURE RESOURCES:&#xD;1. An active Azure Data Explorer (ADX) cluster (or ADX Free cluster at aka.ms/kustofree) with a target database (e.g., MyADXDatabaseName) and table (e.g., Syslog).&#xD;2. An Azure Entra ID App Registration (Service Principal) with a Client Secret.&#xD;3. Database Ingestor permissions granted to the App Registration in Kusto (.add database DatabaseName ingestors ('aadapp=CLIENT_ID;TENANT_ID')).&#xD;&#xD;NOTE: The default vector.json configuration file is automatically downloaded from GitHub to your appdata folder on first container launch if missing.</Requires>
+  <Requires>REQUIRES PRE-CREATED AZURE RESOURCES:&#xD;1. An active Azure Data Explorer (ADX) cluster (or ADX Free cluster at aka.ms/kustofree) with a target database (e.g., MyADXDatabaseName) and table (e.g., Syslog).&#xD;2. An Azure Entra ID App Registration (Service Principal) with a Client Secret.&#xD;3. Database Ingestor permissions granted to the App Registration in Kusto (.add database DatabaseName ingestors ('aadapp=CLIENT_ID;TENANT_ID')).&#xD;&#xD;NOTE: The default vector.yaml configuration file is automatically downloaded from GitHub to your appdata folder on first container launch if missing.</Requires>
   <Category>Tools:Utilities Network:Management</Category>
   <Icon>https://avatars.githubusercontent.com/u/16866914?v=4</Icon>
   <Maintainer>DataBitz</Maintainer>
-  <Changes>Fixed PostArgs execution by removing Entrypoint tag and relying on standard shell execution.</Changes>
+  <ExtraParams>--entrypoint sh</ExtraParams>
+  <Changes>Switched default configuration template to vector.yaml with native comment support.</Changes>
 
-  <!-- Auto-creates vector.json from GitHub if missing on container boot -->
-  <PostArgs>-c 'mkdir -p /etc/vector &amp;&amp; if [ ! -f /etc/vector/vector.json ]; then echo "Creating default vector.json..."; curl -sSL https://raw.githubusercontent.com/DataBitz/unraid-vector-syslog-adx/main/vector.json -o /etc/vector/vector.json; fi &amp;&amp; exec vector --config /etc/vector/vector.json'</PostArgs>
+  <!-- Auto-creates vector.yaml using wget on first container launch if missing -->
+  <PostArgs>-c 'mkdir -p /etc/vector &amp;&amp; if [ ! -f /etc/vector/vector.yaml ]; then echo "Creating default vector.yaml..."; wget -qO /etc/vector/vector.yaml https://raw.githubusercontent.com/DataBitz/unraid-vector-syslog-adx/main/vector.yaml; fi &amp;&amp; exec vector --config /etc/vector/vector.yaml'</PostArgs>
 
-  <!-- Local AppData Configuration Volume -->
+  <!-- Parent AppData Directory Volume Mapping -->
   <Data>
     <Volume>
-      <HostDir>/mnt/user/appdata/vector/vector.json</HostDir>
-      <ContainerDir>/etc/vector/vector.json</ContainerDir>
-      <Mode>ro</Mode>
+      <HostDir>/mnt/user/appdata/vector</HostDir>
+      <ContainerDir>/etc/vector</ContainerDir>
+      <Mode>rw</Mode>
     </Volume>
   </Data>
 
-  <!-- Configuration File Path Mapping -->
-  <Config Name="Vector Configuration File" Target="/etc/vector/vector.json" Default="/mnt/user/appdata/vector/vector.json" Mode="ro" Description="Path to your local vector.json file on Unraid. Vector reads this file on startup to build the syslog ingestion pipeline." Type="Path" Display="always" Required="true" Mask="false"/>
+  <!-- Configuration Directory Path Mapping -->
+  <Config Name="Vector Configuration Directory" Target="/etc/vector" Default="/mnt/user/appdata/vector" Mode="rw" Description="Path to your local Vector appdata directory on Unraid. Set to Read/Write (rw) so Vector can save vector.yaml configuration and disk buffer data." Type="Path" Display="always" Required="true" Mask="false"/>
 
   <!-- ADX / Kusto Cluster Connection Variables -->
   <Config Name="ADX Cluster Name" Target="ADX_CLUSTER_NAME" Default="MyADXClusterName" Description="The name of your free ADX cluster (e.g. 'MyADXClusterName' from ingest-MyADXClusterName.region.kusto.windows.net)." Type="Variable" Display="always" Required="true" Mask="false"/>
@@ -44,8 +45,8 @@
   <Config Name="Azure Client Secret" Target="AZURE_CLIENT_SECRET" Default="" Description="Secret value generated under Certificates &amp; Secrets for your App Registration." Type="Variable" Display="always" Required="true" Mask="true"/>
 
   <!-- Syslog Network Ingestion Settings (Environment Variables) -->
-  <Config Name="Syslog UDP Port" Target="SYSLOG_UDP_PORT" Default="514" Description="Used in both Host and Bridge modes. Sets the internal environment variable referenced by vector.json to define which UDP port the Vector daemon listens on inside the container." Type="Variable" Display="always" Required="true" Mask="false"/>
-  <Config Name="Syslog TCP Port" Target="SYSLOG_TCP_PORT" Default="514" Description="Used in both Host and Bridge modes. Sets the internal environment variable referenced by vector.json to define which TCP port the Vector daemon listens on inside the container." Type="Variable" Display="always" Required="false" Mask="false"/>
+  <Config Name="Syslog UDP Port" Target="SYSLOG_UDP_PORT" Default="514" Description="Used in both Host and Bridge modes. Sets the internal environment variable referenced by vector.yaml to define which UDP port the Vector daemon listens on inside the container." Type="Variable" Display="always" Required="true" Mask="false"/>
+  <Config Name="Syslog TCP Port" Target="SYSLOG_TCP_PORT" Default="514" Description="Used in both Host and Bridge modes. Sets the internal environment variable referenced by vector.yaml to define which TCP port the Vector daemon listens on inside the container." Type="Variable" Display="always" Required="false" Mask="false"/>
   <Config Name="Environment Tag" Target="ENVIRONMENT" Default="unraid" Description="Custom metadata tag added to all outgoing logs to identify the origin network or host." Type="Variable" Display="always" Required="false" Mask="false"/>
 
   <!-- Network Ports for Unraid Template UI & Port Forwarding -->
