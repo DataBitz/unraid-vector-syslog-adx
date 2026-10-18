@@ -13,9 +13,9 @@
   <Overview>Vector is a high-performance, ultra-lightweight log collector and forwarder. This template configures Vector to listen for UDP and TCP Syslog traffic on port 514 and stream structured JSON events to a free Azure Data Explorer (ADX) cluster using Microsoft Entra ID (Service Principal) authentication.</Overview>
   <Requires>REQUIRES PRE-CREATED AZURE RESOURCES:&#xD;1. An active Azure Data Explorer (ADX) cluster (or ADX Free cluster at aka.ms/kustofree) with a target database (e.g., MyADXDatabaseName) and table (e.g., Syslogs).&#xD;2. An Azure Entra ID App Registration (Service Principal) with a Client Secret.&#xD;3. Database Ingestor permissions granted to the App Registration in Kusto (.add database DatabaseName ingestors ('aadapp=CLIENT_ID;TENANT_ID')).&#xD;&#xD;NOTE: The default vector.json configuration file is automatically downloaded from GitHub to your appdata folder on first container launch if missing.</Requires>
   <Category>Tools:Utilities Network:Management</Category>
-  <Icon>https://raw.githubusercontent.com/vectordotdev/vector/master/website/static/img/vector-logo.png</Icon>
+  <Icon>https://avatars.githubusercontent.com/u/16866914?v=4</Icon>
   <Maintainer>DataBitz</Maintainer>
-  <Changes>Added Entrypoint tag to override default vector binary entrypoint and allow shell initialization script execution.</Changes>
+  <Changes>Updated Icon URL to stable GitHub Avatar CDN link.</Changes>
 
   <!-- Overrides default ENTRYPOINT so sh -c executes properly -->
   <Entrypoint>sh</Entrypoint>
@@ -48,7 +48,7 @@
 
   <!-- Syslog Network Ingestion Settings -->
   <Config Name="Syslog UDP Port" Target="SYSLOG_UDP_PORT" Default="514" Description="UDP Port for receiving incoming Syslog packets from local network devices." Type="Variable" Display="always" Required="true" Mask="false"/>
-  <Config Name="Syslog TCP Port" Target="SYSLOG_TCP_PORT" Default="514" Description="TCP Port for receiving incoming Syslog streams from local network devices." Type="Variable" Display="always" Required="true" Mask="false"/>
+  <Config Name="Syslog TCP Port" Target="SYSLOG_TCP_PORT" Default="514" Description="TCP Port for receiving incoming Syslog streams from local network devices." Type="Variable" Display="always" Required="false" Mask="false"/>
   <Config Name="Environment Tag" Target="ENVIRONMENT" Default="home" Description="Custom metadata tag added to all outgoing logs to identify the origin network or host." Type="Variable" Display="always" Required="false" Mask="false"/>
 
   <!-- Network Ports for Unraid Template UI Documentation -->
