@@ -15,7 +15,7 @@
   <Category>Tools:Utilities Network:Management</Category>
   <Icon>https://avatars.githubusercontent.com/u/16866914?v=4</Icon>
   <Maintainer>DataBitz</Maintainer>
-  <Changes>Updated default ADX Table Name to Syslog.</Changes>
+  <Changes>Updated port variable and listener descriptions to clarify usage in Host vs Bridge/Custom network modes.</Changes>
 
   <!-- Overrides default ENTRYPOINT so sh -c executes properly -->
   <Entrypoint>sh</Entrypoint>
@@ -46,14 +46,14 @@
   <Config Name="Azure Client ID" Target="AZURE_CLIENT_ID" Default="" Description="Application (client) ID from your Azure Entra ID App Registration." Type="Variable" Display="always" Required="true" Mask="false"/>
   <Config Name="Azure Client Secret" Target="AZURE_CLIENT_SECRET" Default="" Description="Secret value generated under Certificates &amp; Secrets for your App Registration." Type="Variable" Display="always" Required="true" Mask="true"/>
 
-  <!-- Syslog Network Ingestion Settings -->
-  <Config Name="Syslog UDP Port" Target="SYSLOG_UDP_PORT" Default="514" Description="UDP Port for receiving incoming Syslog packets from local network devices." Type="Variable" Display="always" Required="true" Mask="false"/>
-  <Config Name="Syslog TCP Port" Target="SYSLOG_TCP_PORT" Default="514" Description="TCP Port for receiving incoming Syslog streams from local network devices." Type="Variable" Display="always" Required="false" Mask="false"/>
-  <Config Name="Environment Tag" Target="ENVIRONMENT" Default="home" Description="Custom metadata tag added to all outgoing logs to identify the origin network or host." Type="Variable" Display="always" Required="false" Mask="false"/>
+  <!-- Syslog Network Ingestion Settings (Environment Variables) -->
+  <Config Name="Syslog UDP Port" Target="SYSLOG_UDP_PORT" Default="514" Description="Used in both Host and Bridge modes. Sets the internal environment variable referenced by vector.json to define which UDP port the Vector daemon listens on inside the container." Type="Variable" Display="always" Required="true" Mask="false"/>
+  <Config Name="Syslog TCP Port" Target="SYSLOG_TCP_PORT" Default="514" Description="Used in both Host and Bridge modes. Sets the internal environment variable referenced by vector.json to define which TCP port the Vector daemon listens on inside the container." Type="Variable" Display="always" Required="false" Mask="false"/>
+  <Config Name="Environment Tag" Target="ENVIRONMENT" Default="unraid" Description="Custom metadata tag added to all outgoing logs to identify the origin network or host." Type="Variable" Display="always" Required="false" Mask="false"/>
 
-  <!-- Network Ports for Unraid Template UI Documentation -->
-  <Config Name="Syslog UDP Listener" Target="514" Default="514" Mode="udp" Description="Exposes UDP port 514 on the Unraid host interface for router/switch syslog traffic." Type="Port" Display="always" Required="false" Mask="false"/>
-  <Config Name="Syslog TCP Listener" Target="514" Default="514" Mode="tcp" Description="Exposes TCP port 514 on the Unraid host interface for reliable syslog streaming." Type="Port" Display="always" Required="false" Mask="false"/>
+  <!-- Network Ports for Unraid Template UI & Port Forwarding -->
+  <Config Name="Syslog UDP Listener" Target="514" Default="514" Mode="udp" Description="Used in Bridge/Custom modes for Docker NAT port forwarding (-p 514:514/udp). In Host mode, Docker ignores the NAT mapping, but Unraid uses this entry to display port 514 on the Docker dashboard." Type="Port" Display="always" Required="false" Mask="false"/>
+  <Config Name="Syslog TCP Listener" Target="514" Default="514" Mode="tcp" Description="Used in Bridge/Custom modes for Docker NAT port forwarding (-p 514:514/tcp). In Host mode, Docker ignores the NAT mapping, but Unraid uses this entry to display port 514 on the Docker dashboard." Type="Port" Display="always" Required="false" Mask="false"/>
 
   <!-- Advanced Pipeline Tuning -->
   <Config Name="Batch Max Bytes" Target="BATCH_MAX_BYTES" Default="1048576" Description="Maximum payload size in bytes (default 1 MB = 1048576) accumulated before flushing to ADX." Type="Variable" Display="advanced" Required="false" Mask="false"/>
