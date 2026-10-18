@@ -9,17 +9,17 @@ data_dir: "/var/lib/vector"
 # SOURCES: Define incoming network telemetry inputs
 # ------------------------------------------------------------------------------
 sources:
-  # Listens for UDP Syslog packets (routers, switches, firewalls)
+  # Listens for UDP Syslog traffic from network devices (routers, switches, firewalls)
   syslog_udp:
     type: "syslog"
     mode: "udp"
-    address: "0.0.0.0:514"
+    address: "0.0.0.0:${SYSLOG_UDP_PORT}"
 
   # Listens for TCP Syslog streams (reliable connection-oriented logging)
   syslog_tcp:
     type: "syslog"
     mode: "tcp"
-    address: "0.0.0.0:514"
+    address: "0.0.0.0:${SYSLOG_TCP_PORT}"
 
 # ------------------------------------------------------------------------------
 # TRANSFORMS: Restructure and enrich Syslog fields to match ADX Kusto schema
@@ -65,9 +65,9 @@ sinks:
       max_size: 5368709120  # 5 GB max buffer space
       when_full: "block"    # Pause ingestion if local buffer fills up
 
-    # OAuth2 Client Credentials authentication using Microsoft Entra ID App Registration
+    # Microsoft Entra ID (Service Principal) OAuth2 Authentication using custom strategy
     auth:
-      strategy: "oauth"
+      strategy: "custom"
       grant_type: "client_credentials"
       client_id: "${AZURE_CLIENT_ID}"
       client_secret: "${AZURE_CLIENT_SECRET}"
