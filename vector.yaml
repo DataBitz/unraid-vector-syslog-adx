@@ -1,0 +1,75 @@
+# ==============================================================================
+# Vector Configuration for Azure Data Explorer (ADX) Syslog Ingestion
+# ==============================================================================
+
+# Directory on the Unraid host/container used for local disk buffering and state storage
+data_dir: "/var/lib/vector"
+
+# ------------------------------------------------------------------------------
+# SOURCES: Define incoming network telemetry inputs
+# ------------------------------------------------------------------------------
+sources:
+  # Listens for UDP Syslog packets (routers, switches, firewalls)
+  syslog_udp:
+    type: "syslog"
+    mode: "udp"
+    address: "0.0.0.0:514"
+
+  # Listens for TCP Syslog streams (reliable connection-oriented logging)
+  syslog_tcp:
+    type: "syslog"
+    mode: "tcp"
+    address: "0.0.0.0:514"
+
+# ------------------------------------------------------------------------------
+# TRANSFORMS: Restructure and enrich Syslog fields to match ADX Kusto schema
+# ------------------------------------------------------------------------------
+transforms:
+  format_kusto:
+    type: "remap"
+    inputs:
+      - "syslog_udp"
+      - "syslog_tcp"
+    # Vector Remap Language (VRL) script maps Syslog fields to target table columns
+    source: |
+      .Timestamp = .timestamp
+      .Source = .host
+      .Facility = .facility
+      .Severity = .severity
+      .Message = .message
+      .Environment = "${ENVIRONMENT}"
+      .RawData = .
+
+# ------------------------------------------------------------------------------
+# SINKS: Push processed log batches to Azure Data Explorer (ADX) REST Endpoint
+# ------------------------------------------------------------------------------
+sinks:
+  azure_adx:
+    type: "http"
+    inputs:
+      - "format_kusto"
+    # Kusto HTTP Ingestion URI targeting your specific cluster, database, and table
+    uri: "https://ingest-${ADX_CLUSTER_NAME}.${ADX_REGION}.kusto.windows.net/v1/rest/ingest/v2/ingestFromStream?db=${ADX_DATABASE}&table=${ADX_TABLE}&format=multijson"
+    method: "post"
+    encoding:
+      codec: "json"
+
+    # Batching parameters: Flushes every 1 MB or 5 seconds, whichever comes first
+    batch:
+      max_bytes: 1048576
+      timeout_secs: 5
+
+    # Local disk queue buffer configuration to prevent log loss during outages
+    buffer:
+      type: "disk"
+      max_size: 5368709120  # 5 GB max buffer space
+      when_full: "block"    # Pause ingestion if local buffer fills up
+
+    # OAuth2 Client Credentials authentication using Microsoft Entra ID App Registration
+    auth:
+      strategy: "oauth"
+      grant_type: "client_credentials"
+      client_id: "${AZURE_CLIENT_ID}"
+      client_secret: "${AZURE_CLIENT_SECRET}"
+      token_url: "https://login.microsoftonline.com/${AZURE_TENANT_ID}/oauth2/v2.0/token"
+      scope: "https://kusto.kusto.windows.net/.default"
