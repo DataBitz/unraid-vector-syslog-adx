@@ -11,14 +11,17 @@
   <Project>https://vector.dev/</Project>
   <TemplateURL>https://raw.githubusercontent.com/DataBitz/unraid-vector-syslog-adx/main/unraid-vector-syslog-adx.xml</TemplateURL>
   <Overview>Vector is a high-performance, ultra-lightweight log collector and forwarder. This template configures Vector to listen for UDP and TCP Syslog traffic on port 514 and stream structured JSON events to a free Azure Data Explorer (ADX) cluster using Microsoft Entra ID (Service Principal) authentication.</Overview>
-  <Requires>REQUIRES PRE-CREATED AZURE RESOURCES:&#xD;1. An active Azure Data Explorer (ADX) cluster (or ADX Free cluster at aka.ms/kustofree) with a target database (e.g., HomeTelemetry) and table (e.g., Syslogs).&#xD;2. An Azure Entra ID App Registration (Service Principal) with a Client Secret.&#xD;3. Database Ingestor permissions granted to the App Registration in Kusto (.add database DatabaseName ingestors ('aadapp=CLIENT_ID;TENANT_ID')).&#xD;&#xD;NOTE: The default vector.json configuration file is automatically downloaded from GitHub to your appdata folder on first container launch if missing.</Requires>
+  <Requires>REQUIRES PRE-CREATED AZURE RESOURCES:&#xD;1. An active Azure Data Explorer (ADX) cluster (or ADX Free cluster at aka.ms/kustofree) with a target database (e.g., MyADXDatabaseName) and table (e.g., Syslogs).&#xD;2. An Azure Entra ID App Registration (Service Principal) with a Client Secret.&#xD;3. Database Ingestor permissions granted to the App Registration in Kusto (.add database DatabaseName ingestors ('aadapp=CLIENT_ID;TENANT_ID')).&#xD;&#xD;NOTE: The default vector.json configuration file is automatically downloaded from GitHub to your appdata folder on first container launch if missing.</Requires>
   <Category>Tools:Utilities Network:Management</Category>
   <Icon>https://raw.githubusercontent.com/vectordotdev/vector/master/website/static/img/vector-logo.png</Icon>
   <Maintainer>DataBitz</Maintainer>
-  <Changes>Moved vector.json auto-download notice into the Requires section.</Changes>
+  <Changes>Added Entrypoint tag to override default vector binary entrypoint and allow shell initialization script execution.</Changes>
+
+  <!-- Overrides default ENTRYPOINT so sh -c executes properly -->
+  <Entrypoint>sh</Entrypoint>
 
   <!-- Auto-creates vector.json from GitHub if missing on container boot -->
-  <PostArgs>sh -c 'mkdir -p /etc/vector &amp;&amp; if [ ! -f /etc/vector/vector.json ]; then echo "Creating default vector.json..."; curl -sSL https://raw.githubusercontent.com/DataBitz/unraid-vector-syslog-adx/main/vector.json -o /etc/vector/vector.json; fi &amp;&amp; exec vector --config /etc/vector/vector.json'</PostArgs>
+  <PostArgs>-c 'mkdir -p /etc/vector &amp;&amp; if [ ! -f /etc/vector/vector.json ]; then echo "Creating default vector.json..."; curl -sSL https://raw.githubusercontent.com/DataBitz/unraid-vector-syslog-adx/main/vector.json -o /etc/vector/vector.json; fi &amp;&amp; exec vector --config /etc/vector/vector.json'</PostArgs>
 
   <!-- Local AppData Configuration Volume -->
   <Data>
@@ -33,9 +36,9 @@
   <Config Name="Vector Configuration File" Target="/etc/vector/vector.json" Default="/mnt/user/appdata/vector/vector.json" Mode="ro" Description="Path to your local vector.json file on Unraid. Vector reads this file on startup to build the syslog ingestion pipeline." Type="Path" Display="always" Required="true" Mask="false"/>
 
   <!-- ADX / Kusto Cluster Connection Variables -->
-  <Config Name="ADX Cluster Name" Target="ADX_CLUSTER_NAME" Default="smarthomelogs" Description="The name of your free ADX cluster (e.g. 'smarthomelogs' from ingest-smarthomelogs.region.kusto.windows.net)." Type="Variable" Display="always" Required="true" Mask="false"/>
+  <Config Name="ADX Cluster Name" Target="ADX_CLUSTER_NAME" Default="MyADXClusterName" Description="The name of your free ADX cluster (e.g. 'MyADXClusterName' from ingest-MyADXClusterName.region.kusto.windows.net)." Type="Variable" Display="always" Required="true" Mask="false"/>
   <Config Name="ADX Region" Target="ADX_REGION" Default="eastus" Description="The Azure region where your ADX cluster is provisioned (e.g. 'eastus', 'westeurope', 'australiaeast')." Type="Variable" Display="always" Required="true" Mask="false"/>
-  <Config Name="ADX Database Name" Target="ADX_DATABASE" Default="HomeTelemetry" Description="The target Kusto database name created inside your ADX cluster." Type="Variable" Display="always" Required="true" Mask="false"/>
+  <Config Name="ADX Database Name" Target="ADX_DATABASE" Default="MyADXDatabaseName" Description="The target Kusto database name created inside your ADX cluster." Type="Variable" Display="always" Required="true" Mask="false"/>
   <Config Name="ADX Table Name" Target="ADX_TABLE" Default="Syslogs" Description="The target table inside your Kusto database receiving structured logs." Type="Variable" Display="always" Required="true" Mask="false"/>
 
   <!-- Azure App Registration / Service Principal Auth -->
